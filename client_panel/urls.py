@@ -9,6 +9,7 @@ from client_panel.viewsets.auth import (
     RegisterPage,
     LogoutPage,
     ForgotPwdPage,
+    SetPwdPage,
 )
 
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
     path("register/", RegisterPage.as_view(), name="register-page"),
     path("logout/", LogoutPage.as_view(), name="logout-page"),
     path("forgot-password/", ForgotPwdPage.as_view(), name="fpwd-page"),
+    path("set-password/", SetPwdPage.as_view(), name="spwd-page"),
 
     # Auth 
 ]
