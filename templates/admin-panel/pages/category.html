@@ -1,0 +1,71 @@
+{% extends 'admin-panel/pages/base.html' %}
+
+
+{% block content %}
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between my-5">
+        <span>Product Categories - Page {{page_obj.number}} Of {{page_obj.paginator.num_pages}} pages </span>
+        <a class="btn btn-primary" href="{% url 'admin-categories-create' %}">Create</a>
+    </div>
+    <div class="card p-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Is Published</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in object_list %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <th scope="row">{{i.id}}</th>
+                    <td><a href="{% url 'admin-categories' %}?parent={{i.pk}}">{{i.name}}</a></td>
+                    <td>{% if i.published %} Yes {% else %} No {% endif %}</td>
+                    <td>{{i.priority}}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url 'admin-categories-edit' i.pk %}">Edit</a>
+                        <a class="btn btn-primary" href="{% url 'admin-categories-delete' i.pk %}">Delete</a>
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="9">
+                        <p><strong>Nothing added till now!</strong></p>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr align="center">
+                    <td colspan="9">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li class="page-item"><a class="page-link" {% if page_obj.has_previous %}
+                                        href="{% url 'pricings' %}?page={{page_obj.previous_page_number}}" {% endif %}>Previous</a></li>
+
+                                {% for i in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == i %} active {% endif %}"><a
+                                        class="page-link" {% if page_obj.number == i %} {% else %}
+                                        href="{% url 'pricings' %}?page={{i}}" {% endif %}>
+                                        {{i}}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                                <li class="page-item"><a class="page-link" {% if page_obj.has_next %}
+                                        href="{% url 'pricings' %}?page={{page_obj.next_page_number}}" {% endif %}>Next</a></li>
+                            </ul>
+                        </nav>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
