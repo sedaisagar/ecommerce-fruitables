@@ -42,15 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     # core apps
     'users',
     'products',
-
     # Third party apps
     'crispy_forms',
     'crispy_bootstrap5',
 ]
 
+SITE_ID=1
+
+REQUEST_SCHEME = "http" # "https"
 
 AUTH_USER_MODEL = "users.User"
 

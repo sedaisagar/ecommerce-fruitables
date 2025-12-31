@@ -1,3 +1,4 @@
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -58,7 +59,20 @@ class CategoryCreate(generic.CreateView):
         )
         return data
 
-   
+class CategoryDetail(generic.DetailView):
+    # queryset
+    # model
+
+    # template_name
+    # fields
+
+    model = Category
+    template_name = "admin-panel/pages/category-detail.html"
+
+    def get_context_data(self, **kwargs):
+        data =  super().get_context_data(**kwargs)
+        # self.request.build_absolute_uri()
+        return data
 
     
 class CategoryEdit(generic.UpdateView):
@@ -74,6 +88,13 @@ class CategoryEdit(generic.UpdateView):
 
     success_url = reverse_lazy("admin-categories")
 
+    """
+    def form_valid(self, form):
+        # If the form is valid, redirect to the supplied URL.
+        super().form_valid(form)
+        return redirect("admin-categories")
+    """
+
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
 
@@ -85,6 +106,8 @@ class CategoryEdit(generic.UpdateView):
         )
  
         return data
+
+
 
 
 class CategoryDelete(generic.DeleteView):

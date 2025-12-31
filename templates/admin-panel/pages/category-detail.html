@@ -1,0 +1,22 @@
+{% extends 'admin-panel/pages/base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between my-5">
+        <span>Category Detail</span>
+        <button class="btn btn-danger" onclick="window.history.back();">Back</button>
+    </div>
+    <div class="card p-2">
+        {% if object %}
+        <p>Name : {{object.name}}</p>
+        <p>Is Published : {% if object.published %} Yes {% else %} No {% endif %}</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

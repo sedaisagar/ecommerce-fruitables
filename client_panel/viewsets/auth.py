@@ -26,7 +26,8 @@ class LoginPage(generic.TemplateView):
             auth_ok = authenticate(request, **data)
             if auth_ok:
                 login(request, auth_ok)
-                return redirect("admin-dashboard")
+                return redirect("admin-dashboard") 
+                # /admin/
         return super().get(request, *args, **kwargs)
 
 class RegisterPage(generic.TemplateView):

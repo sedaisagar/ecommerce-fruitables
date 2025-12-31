@@ -29,8 +29,11 @@
                     <td>{% if i.published %} Yes {% else %} No {% endif %}</td>
                     <td>{{i.priority}}</td>
                     <td>
-                        <a class="btn btn-primary" href="{% url 'admin-categories-edit' i.pk %}">Edit</a>
-                        <a class="btn btn-primary" href="{% url 'admin-categories-delete' i.pk %}">Delete</a>
+                        {% comment %}<a class="btn btn-primary" href="{% url 'admin-categories-edit' i.pk %}">Edit</a>
+                        <a class="btn btn-primary" href="{% url 'admin-categories-delete' i.pk %}">Delete</a>{% endcomment %}
+                        <a class="btn btn-success" href="{{i.get_absolute_url}}">Detail View</a>
+                        <a class="btn btn-primary" href="{{i.get_absolute_url_for_edit}}">Edit</a>
+                        <a class="btn btn-danger" href="{{i.get_absolute_url_for_delete}}">Delete</a>
                     </td>
                 </tr>
 
