@@ -1,3 +1,4 @@
+from django import forms
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import generic
@@ -35,6 +36,9 @@ class CategoryList(generic.ListView):
 
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
+        query_params = self.request.GET
+        if parent_pk := query_params.get("parent"):
+            data.update(parent=parent_pk)
         return data
 
 class CategoryCreate(generic.CreateView):
@@ -46,19 +50,46 @@ class CategoryCreate(generic.CreateView):
 
     model = Category
     template_name = "admin-panel/forms/form.html"
-    fields = "__all__"
+    # fields = "__all__"
+    fields = ["parent", "name", "slug", "published", "priority"]
 
     success_url = reverse_lazy("admin-categories")
 
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
-        
+        query_params = self.request.GET
+
+        if parent_pk := query_params.get("parent"):
+            data.update(parent=parent_pk)
+
         data.update(
             title = "Create Category",
             redirect_url=self.success_url,
         )
         return data
+    
+    def get_initial(self):
+        data = super().get_initial()
 
+        query_params = self.request.GET
+        if parent_pk := query_params.get("parent"):
+            data['parent'] = parent_pk
+        return data
+
+    def get_form(self, form_class = None):
+        print("GET form")
+        form = super().get_form(form_class)
+        # form.fields['parent'] = forms.CharField(widget=forms.HiddenInput())
+
+        # form.fields['parent'].label.title = ""
+        # form.fields['parent'].widget.attrs.update( {"style":"display:none"})
+        
+        return form
+
+    def post(self, request, *args, **kwargs):
+        breakpoint()
+        return super().post(request, *args, **kwargs)
+  
 class CategoryDetail(generic.DetailView):
     # queryset
     # model
@@ -98,6 +129,11 @@ class CategoryEdit(generic.UpdateView):
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
 
+        query_params = self.request.GET
+
+        if parent_pk := query_params.get("parent"):
+            data.update(parent=parent_pk)
+
         data.update(
             title = "Edit Category ? ",
             show_object = False,
@@ -124,6 +160,11 @@ class CategoryDelete(generic.DeleteView):
 
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
+
+        query_params = self.request.GET
+
+        if parent_pk := query_params.get("parent"):
+            data.update(parent=parent_pk)
 
         data.update(
             title = "Delete This Category Object ? ",

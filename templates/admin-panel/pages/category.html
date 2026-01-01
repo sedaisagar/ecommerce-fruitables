@@ -6,7 +6,7 @@
 
     <div class="d-flex justify-content-between my-5">
         <span>Product Categories - Page {{page_obj.number}} Of {{page_obj.paginator.num_pages}} pages </span>
-        <a class="btn btn-primary" href="{% url 'admin-categories-create' %}">Create</a>
+        <a class="btn btn-primary" href="{% url 'admin-categories-create' %}?parent={{parent}}">Create</a>
     </div>
     <div class="card p-2">
         <table class="table">
@@ -31,9 +31,10 @@
                     <td>
                         {% comment %}<a class="btn btn-primary" href="{% url 'admin-categories-edit' i.pk %}">Edit</a>
                         <a class="btn btn-primary" href="{% url 'admin-categories-delete' i.pk %}">Delete</a>{% endcomment %}
-                        <a class="btn btn-success" href="{{i.get_absolute_url}}">Detail View</a>
-                        <a class="btn btn-primary" href="{{i.get_absolute_url_for_edit}}">Edit</a>
-                        <a class="btn btn-danger" href="{{i.get_absolute_url_for_delete}}">Delete</a>
+
+                        <a class="btn btn-success" href="{{i.get_absolute_url}}?parent={{parent}}">Detail View</a>
+                        <a class="btn btn-primary" href="{{i.get_absolute_url_for_edit}}?parent={{parent}}">Edit</a>
+                        <a class="btn btn-danger" href="{{i.get_absolute_url_for_delete}}?parent={{parent}}?parent={{parent}}">Delete</a>
                     </td>
                 </tr>
 
