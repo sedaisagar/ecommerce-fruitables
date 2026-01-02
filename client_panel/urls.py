@@ -2,6 +2,7 @@ from django.urls import path
 from client_panel.viewsets.views import (
     HomePage,
     ShopPage,
+    ShopDetailPage,
 )
 
 from client_panel.viewsets.auth import (
@@ -15,6 +16,7 @@ from client_panel.viewsets.auth import (
 urlpatterns = [
     path("", HomePage.as_view(), name="home-page"),
     path("shop/", ShopPage.as_view(), name="shop-page"),
+    path("shop/<str:slug>/", ShopDetailPage.as_view(), name="shop-detail"),
     # Auth 
     path("login/", LoginPage.as_view(), name="login-page"),
     path("register/", RegisterPage.as_view(), name="register-page"),

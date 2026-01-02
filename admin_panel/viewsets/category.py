@@ -55,6 +55,13 @@ class CategoryCreate(generic.CreateView):
 
     success_url = reverse_lazy("admin-categories")
 
+    def get_success_url(self):
+        url =  super().get_success_url()
+        query_params = self.request.GET
+        if parent_pk := query_params.get("parent"):
+            url = f"{url}?parent={parent_pk}"
+        return url 
+
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
         query_params = self.request.GET
@@ -87,7 +94,6 @@ class CategoryCreate(generic.CreateView):
         return form
 
     def post(self, request, *args, **kwargs):
-        breakpoint()
         return super().post(request, *args, **kwargs)
   
 class CategoryDetail(generic.DetailView):
@@ -99,7 +105,7 @@ class CategoryDetail(generic.DetailView):
 
     model = Category
     template_name = "admin-panel/pages/category-detail.html"
-
+    
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
         # self.request.build_absolute_uri()
@@ -115,7 +121,9 @@ class CategoryEdit(generic.UpdateView):
 
     model = Category
     template_name = "admin-panel/forms/form.html"
-    fields = "__all__"
+    # fields = "__all__"
+    fields = ["name", "slug", "published", "priority"]
+
 
     success_url = reverse_lazy("admin-categories")
 
@@ -125,6 +133,13 @@ class CategoryEdit(generic.UpdateView):
         super().form_valid(form)
         return redirect("admin-categories")
     """
+
+    def get_success_url(self):
+        url =  super().get_success_url()
+        query_params = self.request.GET
+        if parent_pk := query_params.get("parent"):
+            url = f"{url}?parent={parent_pk}"
+        return url 
 
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)
@@ -157,6 +172,13 @@ class CategoryDelete(generic.DeleteView):
     model = Category
     template_name = "admin-panel/forms/form.html"
     success_url = reverse_lazy("admin-categories")
+    
+    def get_success_url(self):
+        url =  super().get_success_url()
+        query_params = self.request.GET
+        if parent_pk := query_params.get("parent"):
+            url = f"{url}?parent={parent_pk}"
+        return url 
 
     def get_context_data(self, **kwargs):
         data =  super().get_context_data(**kwargs)

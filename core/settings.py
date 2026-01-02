@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     # core apps
     'users',
     'products',
+    'pages',
     # Third party apps
     'crispy_forms',
     'crispy_bootstrap5',
+    'tinymce',
 ]
 
 SITE_ID=1

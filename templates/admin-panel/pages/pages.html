@@ -5,8 +5,8 @@
 <div class="container mt-5">
 
     <div class="d-flex justify-content-between my-5">
-        <span>Product Categories - Page {{page_obj.number}} Of {{page_obj.paginator.num_pages}} pages </span>
-        <a class="btn btn-primary" href="{% url 'admin-categories-create' %}?parent={{parent}}">Create</a>
+        <span>Dynamic Pages- Page {{page_obj.number}} Of {{page_obj.paginator.num_pages}} pages </span>
+        <a class="btn btn-primary" href="{% url 'admin-pages-create' %}">Create</a>
     </div>
     <div class="card p-2">
         <table class="table">
@@ -14,7 +14,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Id</th>
-                    <th scope="col">Name</th>
+                    <th scope="col">Title</th>
                     <th scope="col">Is Published</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Actions</th>
@@ -25,16 +25,13 @@
                 <tr>
                     <th scope="row">{{forloop.counter}}</th>
                     <th scope="row">{{i.id}}</th>
-                    <td><a href="{% url 'admin-categories' %}?parent={{i.pk}}">{{i.name}}</a></td>
+                    <td><a href="{% url 'admin-pages-detail' i.pk %}">{{i.title}}</a></td>
                     <td>{% if i.published %} Yes {% else %} No {% endif %}</td>
                     <td>{{i.priority}}</td>
                     <td>
-                        {% comment %}<a class="btn btn-primary" href="{% url 'admin-categories-edit' i.pk %}">Edit</a>
-                        <a class="btn btn-primary" href="{% url 'admin-categories-delete' i.pk %}">Delete</a>{% endcomment %}
-
-                        <a class="btn btn-success" href="{{i.get_absolute_url}}?parent={{parent}}">Detail View</a>
-                        <a class="btn btn-primary" href="{{i.get_absolute_url_for_edit}}?parent={{parent}}">Edit</a>
-                        <a class="btn btn-danger" href="{{i.get_absolute_url_for_delete}}?parent={{parent}}">Delete</a>
+                        <a class="btn btn-success" href="{{i.get_absolute_url}}">Detail View</a>
+                        <a class="btn btn-primary" href="{{i.get_absolute_url_for_edit}}">Edit</a>
+                        <a class="btn btn-danger" href="{{i.get_absolute_url_for_delete}}">Delete</a>
                     </td>
                 </tr>
 
@@ -50,18 +47,18 @@
                         <nav aria-label="Page navigation example">
                             <ul class="pagination">
                                 <li class="page-item"><a class="page-link" {% if page_obj.has_previous %}
-                                        href="{% url 'pricings' %}?page={{page_obj.previous_page_number}}" {% endif %}>Previous</a></li>
+                                        href="{% url 'admin-pages' %}?page={{page_obj.previous_page_number}}" {% endif %}>Previous</a></li>
 
                                 {% for i in page_obj.paginator.page_range %}
                                 <li class="page-item {% if page_obj.number == i %} active {% endif %}"><a
                                         class="page-link" {% if page_obj.number == i %} {% else %}
-                                        href="{% url 'pricings' %}?page={{i}}" {% endif %}>
+                                        href="{% url 'admin-pages' %}?page={{i}}" {% endif %}>
                                         {{i}}
                                     </a>
                                 </li>
                                 {% endfor %}
                                 <li class="page-item"><a class="page-link" {% if page_obj.has_next %}
-                                        href="{% url 'pricings' %}?page={{page_obj.next_page_number}}" {% endif %}>Next</a></li>
+                                        href="{% url 'admin-pages' %}?page={{page_obj.next_page_number}}" {% endif %}>Next</a></li>
                             </ul>
                         </nav>
                     </td>

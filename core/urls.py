@@ -22,6 +22,8 @@ urlpatterns = [
     # 
     path("admin/", include("admin_panel.urls")),
     path("", include("client_panel.urls")),
+    # Third party package's url
+    path('tinymce/', include('tinymce.urls')),
 ]
 
 
