@@ -7,7 +7,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from pages.models import DynamicPages
 from tinymce.widgets import TinyMCE
 
-class DynamicPagesList(generic.ListView):
+from utils.auth_mixins import AdminLoginRequiredMixin
+
+class DynamicPagesList(AdminLoginRequiredMixin,generic.ListView):
     # queryset
     # model
 
@@ -42,7 +44,7 @@ class DynamicPagesList(generic.ListView):
         #     data.update(parent=parent_pk)
         return data
 
-class DynamicPagesCreate(generic.CreateView):
+class DynamicPagesCreate(AdminLoginRequiredMixin,generic.CreateView):
     # queryset
     # model
 
@@ -99,7 +101,7 @@ class DynamicPagesCreate(generic.CreateView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
   
-class DynamicPagesDetail(generic.DetailView):
+class DynamicPagesDetail(AdminLoginRequiredMixin,generic.DetailView):
     # queryset
     # model
 
@@ -115,7 +117,7 @@ class DynamicPagesDetail(generic.DetailView):
         return data
 
     
-class DynamicPagesEdit(generic.UpdateView):
+class DynamicPagesEdit(AdminLoginRequiredMixin,generic.UpdateView):
     # queryset
     # model
 
@@ -174,7 +176,7 @@ class DynamicPagesEdit(generic.UpdateView):
         return form
 
 
-class DynamicPagesDelete(generic.DeleteView):
+class DynamicPagesDelete(AdminLoginRequiredMixin,generic.DeleteView):
 
     # queryset
     # model

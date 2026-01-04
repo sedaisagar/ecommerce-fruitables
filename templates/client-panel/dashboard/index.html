@@ -1,0 +1,285 @@
+{% extends 'client-panel/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-1">User Profile</h4>
+            <p class="text-muted">Welcome back, {{ request.user.email }}</p>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="view-tab" data-bs-toggle="tab" data-bs-target="#view-content"
+                        type="button" role="tab" aria-controls="view-content" aria-selected="true">
+                        <i class="bx bx-user me-2"></i>View Profile
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-content"
+                        type="button" role="tab" aria-controls="edit-content" aria-selected="false">
+                        <i class="bx bx-edit me-2"></i>Edit Profile
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- View Profile Tab -->
+        <div class="tab-pane fade show active" id="view-content" role="tabpanel" aria-labelledby="view-tab">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Email Address</label>
+                                    <p class="fw-semibold">{{ request.user.email }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">First Name</label>
+                                    <p class="fw-semibold">{{ request.user.first_name|default:"Not provided" }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Last Name</label>
+                                    <p class="fw-semibold">{{ request.user.last_name|default:"Not provided" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Member Since</label>
+                                    <p class="fw-semibold">{{ request.user.date_joined|date:"M d, Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Account Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Account Status</label>
+                                    <span class="badge bg-success">Active</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-muted small">Last Login</label>
+                                    <p class="fw-semibold">{{ request.user.last_login|default:"Not available"|date:"M d,Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="avatar avatar-xl mb-3">
+                                    <span class="avatar-initial rounded-circle bg-label-primary">
+                                        <i class="bx bx-user bx-lg"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <h5 class="mb-2">{{ request.user.get_full_name|default:"User" }}</h5>
+                            <p class="text-muted small">{{ request.user.email }}</p>
+                            <button class="btn btn-sm btn-primary mt-3 w-100 mb-2" data-bs-toggle="tab"
+                                data-bs-target="#edit-content">
+                                <i class="bx bx-edit me-1"></i>Edit Profile
+                            </button>
+                            <a href="{% url 'logout-page' %}" class="btn btn-sm btn-danger w-100">
+                                <i class="bx bx-log-out me-1"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Tab -->
+        <div class="tab-pane fade" id="edit-content" role="tabpanel" aria-labelledby="edit-tab">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Edit Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="editProfileForm" action="#" method="POST">
+                                {% csrf_token %}
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="firstName">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" name="first_name"
+                                            value="{{ request.user.first_name }}" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="lastName">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" name="last_name"
+                                            value="{{ request.user.last_name }}" />
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label" for="email">Email Address</label>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            value="{{ request.user.email }}" disabled />
+                                        <small class="text-muted">Contact support to change your email address</small>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label" for="phone">Phone Number (Optional)</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone"
+                                            placeholder="+1 (555) 000-0000" />
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label" for="address">Address (Optional)</label>
+                                        <input type="text" class="form-control" id="address" name="address"
+                                            placeholder="123 Main Street" />
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="city">City (Optional)</label>
+                                        <input type="text" class="form-control" id="city" name="city"
+                                            placeholder="New York" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="state">State/Province (Optional)</label>
+                                        <input type="text" class="form-control" id="state" name="state"
+                                            placeholder="NY" />
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="zipcode">Postal Code (Optional)</label>
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode"
+                                            placeholder="10001" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="country">Country (Optional)</label>
+                                        <input type="text" class="form-control" id="country" name="country"
+                                            placeholder="United States" />
+                                    </div>
+                                </div>
+
+                                <div class="row pt-2">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary me-2">
+                                            <i class="bx bx-check me-1"></i>Save Changes
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('editProfileForm').reset()">
+                                            <i class="bx bx-x me-1"></i>Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <button class="btn btn-outline-warning w-100 mb-2">
+                                    <i class="bx bx-lock me-2"></i>Change Password
+                                </button>
+                            </div>
+                            <div class="mb-3">
+                                <button class="btn btn-outline-danger w-100">
+                                    <i class="bx bx-trash me-2"></i>Delete Account
+                                </button>
+                            </div>
+                            <small class="text-muted">These actions cannot be undone.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-tabs .nav-link {
+        color: #6f7280;
+        border-bottom: 2px solid transparent;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link:hover {
+        border-bottom-color: #d1d5db;
+        color: #4b5563;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #1a202c;
+        border-bottom-color: #5e72e4;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .avatar-xl {
+        font-size: 2.5rem;
+    }
+</style>
+
+<script>
+    // Initialize Bootstrap Tab functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('data-bs-target');
+                const targetPane = document.querySelector(targetId);
+                
+                if (targetPane) {
+                    // Remove active class from all tabs and panes
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                        link.setAttribute('aria-selected', 'false');
+                    });
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    
+                    // Add active class to clicked tab and corresponding pane
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+                    targetPane.classList.add('show', 'active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

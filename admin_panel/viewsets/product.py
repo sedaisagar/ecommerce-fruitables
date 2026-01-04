@@ -8,7 +8,9 @@ from admin_panel.forms.product_form import ProductForm
 from products.models import Products
 from tinymce.widgets import TinyMCE
 
-class ProductsList(generic.ListView):
+from utils.auth_mixins import AdminLoginRequiredMixin
+
+class ProductsList(AdminLoginRequiredMixin,generic.ListView):
     # queryset
     # model
 
@@ -43,7 +45,7 @@ class ProductsList(generic.ListView):
         #     data.update(parent=parent_pk)
         return data
 
-class ProductsCreate(generic.CreateView):
+class ProductsCreate(AdminLoginRequiredMixin,generic.CreateView):
     # queryset
     # model
 
@@ -66,7 +68,7 @@ class ProductsCreate(generic.CreateView):
         return data
     
     
-class ProductsDetail(generic.DetailView):
+class ProductsDetail(AdminLoginRequiredMixin,generic.DetailView):
     model = Products
     template_name = "admin-panel/pages/product-detail.html"
     
@@ -75,7 +77,7 @@ class ProductsDetail(generic.DetailView):
         return data
 
     
-class ProductsEdit(generic.UpdateView):
+class ProductsEdit(AdminLoginRequiredMixin,generic.UpdateView):
     model = Products
     template_name = "admin-panel/forms/dynamic-form.html"
     # fields = [
@@ -119,7 +121,7 @@ class ProductsEdit(generic.UpdateView):
         return form
 
 
-class ProductsDelete(generic.DeleteView):
+class ProductsDelete(AdminLoginRequiredMixin,generic.DeleteView):
 
     # queryset
     # model

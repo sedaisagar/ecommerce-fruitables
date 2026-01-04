@@ -5,9 +5,10 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from products.models import Category
+from utils.auth_mixins import AdminLoginRequiredMixin
 
 
-class CategoryList(generic.ListView):
+class CategoryList(AdminLoginRequiredMixin,generic.ListView):
     # queryset
     # model
 
@@ -41,7 +42,7 @@ class CategoryList(generic.ListView):
             data.update(parent=parent_pk)
         return data
 
-class CategoryCreate(generic.CreateView):
+class CategoryCreate(AdminLoginRequiredMixin,generic.CreateView):
     # queryset
     # model
 
@@ -96,7 +97,7 @@ class CategoryCreate(generic.CreateView):
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
   
-class CategoryDetail(generic.DetailView):
+class CategoryDetail(AdminLoginRequiredMixin,generic.DetailView):
     # queryset
     # model
 
@@ -112,7 +113,7 @@ class CategoryDetail(generic.DetailView):
         return data
 
     
-class CategoryEdit(generic.UpdateView):
+class CategoryEdit(AdminLoginRequiredMixin,generic.UpdateView):
     # queryset
     # model
 
@@ -161,7 +162,7 @@ class CategoryEdit(generic.UpdateView):
 
 
 
-class CategoryDelete(generic.DeleteView):
+class CategoryDelete(AdminLoginRequiredMixin,generic.DeleteView):
 
     # queryset
     # model
