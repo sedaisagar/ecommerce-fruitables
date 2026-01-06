@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import redirect
 from django.views import generic
 
@@ -7,6 +8,11 @@ from products.models import Products
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F,Sum
+
+from django.conf import settings
+
+import requests
+
 class ClientDashBoardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/index.html"
 
@@ -55,4 +61,53 @@ class ClientCartView(LoginRequiredMixin, generic.TemplateView):
 class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/checkout.html"
 
+    def get_context_data(self, **kwargs):
+        data =  super().get_context_data(**kwargs)
+        cart = UserCart.objects.filter(user=self.request.user) # prefetch related
+        if cart.exists():
+            cart = cart.first()
+            items = cart.purchase_items.all()
+            data["items"] = items
+            data["cart"] = cart
+            data["cart_total"] = items.aggregate(total=Sum(F("quantity")*F("price"))).get("total") or 0
+        return data
     
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        if context.get("cart_total", 0) <= 0:
+            return redirect("shop-page")
+        return self.render_to_response(context)
+    
+    def post(self, request, *args, **kwargs):
+        # Handle Checkout Logic Here
+        data = self.get_context_data(**kwargs)
+        cart_total = data.get("cart_total", 0)
+        cart = data.get("cart")
+        if not cart_total:
+            return redirect("shop-page")
+        
+         # Khalti Payment Integration
+        url = settings.KHALTI_API
+        initiate_url = url + "epayment/initiate/"
+        secret_key = settings.KHALTI_LIVE_SECRET_KEY
+
+        headers = {
+            "Authorization": f"Key {secret_key}",  
+             'Content-Type': 'application/json',
+        }  
+
+        payload = {
+            "return_url": "http://localhost:8000/",
+            "website_url": "http://localhost:8000/",
+            "amount": float(cart_total) * 100,  # Amount in paisa
+            "purchase_order_id": cart.id,
+            "purchase_order_name": f"Ecommerce Payment - {cart.id} - by - {request.user.username}",
+        }
+        response = requests.request("POST", initiate_url, headers=headers, data=json.dumps(payload))
+
+        if response.status_code == 200:
+            response_data = response.json()
+            checkout_url = response_data.get("payment_url")
+            return redirect(checkout_url)
+
+        return redirect("client-dash")
