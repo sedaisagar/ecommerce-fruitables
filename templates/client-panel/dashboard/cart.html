@@ -136,6 +136,8 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- Cart Page End -->
 <script>
     // document.addEventListener( "DOMContentLoaded", () => {
@@ -172,7 +174,8 @@
         formData.append( "product", product )
         formData.append( "quantity", qty )
         formData.append( "csrfmiddlewaretoken", '{{csrf_token}}' )
-        fetch( "{% url 'client-cart' %}", { method: "POST", headers: { "Content-Type": "multipart/form-data", }, body: formData } ).then( r => r.text() ).then( r => console.log )
+
+        fetch( "{% url 'client-cart' %}", { method: "POST", body: formData } ).then( r => r.text() ).then( r => console.log )
     }
 
     const increment_item = ( target, product ) => {
@@ -210,5 +213,4 @@
         }, 200 );
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
