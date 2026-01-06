@@ -6,7 +6,7 @@ from client_panel.forms.cart import CartAddForm
 from products.models import Products
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.db.models import F,Sum
 class ClientDashBoardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/index.html"
 
@@ -36,7 +36,6 @@ class ClientCartView(LoginRequiredMixin, generic.TemplateView):
 
     def post(self,request, *args, **kwargs):
         form = CartAddForm(data=request.POST)
-        
         if form.is_valid():
             data = form.cleaned_data
             self.handle_cart_add_action(data) # handling cart add action            
@@ -50,7 +49,7 @@ class ClientCartView(LoginRequiredMixin, generic.TemplateView):
             cart = cart.first()
             items = cart.purchase_items.all()
             data["items"] = items
-
+            data["cart_total"] = items.aggregate(total=Sum(F("quantity")*F("price"))).get("total") or 0
         return data
 
 class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
