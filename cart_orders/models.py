@@ -21,6 +21,9 @@ class PurchaseItems(BaseModel):
     class  Meta:
         db_table = "purchase_items"
 
+    @property
+    def total(self):
+        return self.price * self.quantity
 
 class ShippingBillingAddress(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shipping_billing_address")
