@@ -181,7 +181,8 @@
         formData.append( "product", product )
         formData.append( "quantity", qty )
         formData.append( "csrfmiddlewaretoken", '{{csrf_token}}' )
-        fetch( "{% url 'client-cart' %}", { method: "POST", body: formData } ).then( r => r.text() ).then( r => console.log )
+        
+        fetch( "{% url 'client-cart' %}", { method: "POST", body: formData  } ).then( r => r.text() ).then( r => console.log )
     }
 
     const increment_item = ( target, product ) => {

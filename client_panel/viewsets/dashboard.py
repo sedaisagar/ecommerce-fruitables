@@ -1,9 +1,10 @@
 import json
+import random
 from django.shortcuts import redirect
 from django.views import generic
 
-from cart_orders.models import UserCart, PurchaseItems
-from client_panel.forms.cart import CartAddForm
+from cart_orders.models import ShippingBillingAddress, UserCart, PurchaseItems
+from client_panel.forms.cart import CartAddForm, ShippingBillingForm
 from products.models import Products
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -58,6 +59,9 @@ class ClientCartView(LoginRequiredMixin, generic.TemplateView):
             data["cart_total"] = items.aggregate(total=Sum(F("quantity")*F("price"))).get("total") or 0
         return data
 
+
+# Model.objects.aggregate() # ->  Add, Sub, Mul, Div, Count, Avg, Max, Min
+
 class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/checkout.html"
 
@@ -68,8 +72,10 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
             cart = cart.first()
             items = cart.purchase_items.all()
             data["items"] = items
-            data["cart"] = cart
             data["cart_total"] = items.aggregate(total=Sum(F("quantity")*F("price"))).get("total") or 0
+            data["cart"] = cart
+            data["address"] = ShippingBillingAddress.objects.filter(user=self.request.user).first()
+            # breakpoint()
         return data
     
     def get(self, request, *args, **kwargs):
@@ -78,15 +84,8 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
             return redirect("shop-page")
         return self.render_to_response(context)
     
-    def post(self, request, *args, **kwargs):
-        # Handle Checkout Logic Here
-        data = self.get_context_data(**kwargs)
-        cart_total = data.get("cart_total", 0)
-        cart = data.get("cart")
-        if not cart_total:
-            return redirect("shop-page")
-        
-         # Khalti Payment Integration
+    def handle_khalti_payment(self, request, cart, cart_total):
+        # Khalti Payment Integration
         url = settings.KHALTI_API
         initiate_url = url + "epayment/initiate/"
         secret_key = settings.KHALTI_LIVE_SECRET_KEY
@@ -97,17 +96,35 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
         }  
 
         payload = {
-            "return_url": "http://localhost:8000/",
+            "return_url": "http://localhost:8000/payment-verify/",
             "website_url": "http://localhost:8000/",
             "amount": float(cart_total) * 100,  # Amount in paisa
-            "purchase_order_id": cart.id,
+            "purchase_order_id": f"{cart.id}-{random.randint(1000,9999)}",
             "purchase_order_name": f"Ecommerce Payment - {cart.id} - by - {request.user.username}",
         }
         response = requests.request("POST", initiate_url, headers=headers, data=json.dumps(payload))
 
-        if response.status_code == 200:
+        if response.status_code == 200: # Sucess Case 
             response_data = response.json()
             checkout_url = response_data.get("payment_url")
             return redirect(checkout_url)
 
+    def post(self, request, *args, **kwargs):
+        # Handle Checkout Logic Here
+        data = self.get_context_data(**kwargs)
+        cart_total = data.get("cart_total", 0)
+        cart = data.get("cart")
+        if not cart_total:
+            return redirect("shop-page")
+        
+        form = ShippingBillingForm(data=request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            shipping_address, created = ShippingBillingAddress.objects.update_or_create(
+                user=request.user,
+                defaults = data
+            )
+
+            # Proceed to Payment Gateway Integration
+            return self.handle_khalti_payment(request, cart, cart_total)
         return redirect("client-dash")
