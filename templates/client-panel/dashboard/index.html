@@ -106,6 +106,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="card p-5">
+                        <h1 class="">My Orders</h1>
+                        
+                        {% for i in orders %}
+                        <div class="card mb-3 p-3 mt-4">
+                            <h5>Order #{{ i.id }}</h5>
+                            <h6>Items:</h6>
+                            <ul>
+                                {% for item in i.order_items.all %}
+                                <li class="my-2"> <img src="{{item.product.image.url}}" height="50" width="50" alt="" class="rounded-circle"> {{ item.product.name }} - Quantity: {{ item.quantity }} - Price: Rs. {{ item.price }} - Total : Rs. {{item.total}}</li>
+                                {% endfor %}
+                            </ul>
+                            <p>Order Notes: {{ i.order_notes|default:"No order notes added !" }}</p>
+                            <p>Amount: Rs. {{ i.payment_details.amount }}</p>
+                            <p>Payment Method: {{ i.payment_details.get_payment_method_display }}</p>
+                            <p>Payment ID: {{ i.payment_details.payment_id }}</p>
+                            <p>Payment Status: {{ i.payment_details.get_status_display }}</p>
+                            <p>Extra Data : {{i.payment_details.extra_data}}</p>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -220,6 +244,8 @@
                         </div>
                     </div>
                 </div>
+
+                
             </div>
         </div>
     </div>

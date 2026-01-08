@@ -2,6 +2,7 @@ from django.urls import path, include
 
 from client_panel.viewsets.dashboard import (
     ClientDashBoardView,
+    ClientPaymentVerifyView,
     ClientCartView,
     ClientCheckOutView,
 )
@@ -30,6 +31,7 @@ urlpatterns = [
     path("logout/", LogoutPage.as_view(), name="logout-page"),
     path("forgot-password/", ForgotPwdPage.as_view(), name="fpwd-page"),
     path("set-password/", SetPwdPage.as_view(), name="spwd-page"),
+    path("payment-verify", ClientPaymentVerifyView.as_view(), name="client-payment-verify"),
     # Client Dashboard
     path("user/", include(
         [

@@ -21,5 +21,5 @@ class ShippingBillingForm(forms.ModelForm):
             "zip_code",
             "mobile",
             "email",
-            "order_notes",
+            # "order_notes",
         ]
