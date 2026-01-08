@@ -1,0 +1,25 @@
+{% extends 'client-panel/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Start -->
+<div class="container-fluid py-5 mb-5 hero-header">
+    <div class="container py-5">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 text-center text-lg-start">
+                <h1 class="display-4 mb-4 mb-lg-0">Payment Verification</h1>
+            </div>
+            <div class="col-lg-6 text-center text-lg-end">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb justify-content-center justify-content-lg-end mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'client-dash' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Payment Verification</li>
+                    </ol>   
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
