@@ -1,3 +1,6 @@
+import base64
+import hashlib
+import hmac
 import json
 import random
 from django.shortcuts import redirect
@@ -96,11 +99,73 @@ class ClientPaymentVerifyView(generic.TemplateView):
                     return redirect("client-dash")
         
         return redirect("client-dash")
-        
-    def get(self, request, *args, **kwargs):
-        # Handle Payment Verification Logic Here
-        return self.handle_khalti_payment_verification(request)
     
+    def handle_esewa_payment_verification(self, request):
+        params = request.GET.dict()
+        data = params.get("data", "")
+        
+        decoded_message = base64.b64decode(data)
+        json_data = json.loads(decoded_message)
+
+        total_amount = json_data.get("total_amount")
+        transaction_uuid = json_data.get("transaction_uuid")
+        status_check_url = f"https://rc.esewa.com.np/api/epay/transaction/status/?product_code={settings.ESEWA_MERCHANT_ID}&total_amount={total_amount}&transaction_uuid={transaction_uuid}"
+
+        response = requests.get(status_check_url)
+        if response.status_code == 200:
+            response = response.json()
+            payment_details = PaymentDetails.objects.filter(payment_id=transaction_uuid).first()
+            if not payment_details:
+                # fallback page
+                return redirect("client-dash")
+            match response.get("status"):
+                case "COMPLETE":
+                    payment_details.status = "completed"
+
+                    # Order place
+                    cart = payment_details.cart
+                    if cart:
+                        user_order = UserOrder.objects.create(
+                            user = cart.user,
+                            order_notes = cart.order_notes or ""
+                        )
+                        purchase_items = cart.purchase_items.all()
+                        order_items_bulk = [] # 100 items to be created
+                        for item in purchase_items:
+                            order_item =  OrderItems(
+                                order = user_order,
+                                product = item.product,
+                                quantity = item.quantity,
+                                price = item.price,
+                            )
+                            order_items_bulk.append(order_item)
+                        OrderItems.objects.bulk_create(order_items_bulk)
+
+                        # Clear order notes after creating order
+                        cart.order_notes = ""
+                        cart.save(update_fields=["order_notes"])
+
+                        purchase_items.delete() # Clear Purchase Items After Order Created
+
+                        payment_details.order = user_order
+                        payment_details.cart = None
+                        payment_details.extra_data = response
+                        payment_details.save(update_fields=["status", "order", "cart", "extra_data"])
+            return redirect("client-dash")
+        
+        return redirect("client-checkout")
+
+    def get(self, request, *args, **kwargs):
+        params = request.GET.dict()
+
+        if "data" in params:
+            # Handle Esewa Payment Verification Logic Here
+            return self.handle_esewa_payment_verification(request)
+        else:
+            # khalti
+            # Handle Payment Verification Logic Here
+            return self.handle_khalti_payment_verification(request)
+        
 class ClientCartView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/cart.html"
 
@@ -190,15 +255,23 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
             response_data = response.json()
             checkout_url = response_data.get("payment_url")
 
-            PaymentDetails.objects.create(
+            payment_details, created = PaymentDetails.objects.get_or_create(
                 cart = cart,
-                order = None,
-                payment_method = "khalti",
-                payment_id = payload.get("purchase_order_id"),
-                amount = cart_total,
-                status = "pending",
-                extra_data = {}
+               defaults=dict(
+                    order = None,
+                    payment_method = "khalti",
+                    payment_id = payload.get("purchase_order_id"),
+                    amount = cart_total,
+                    status = "pending",
+                    extra_data = {}
+               )
             )
+            if not created:
+                payment_details.amount = cart_total
+                payment_details.payment_id = payload.get("purchase_order_id")
+                payment_details.status = "pending"
+                payment_details.payment_method = "khalti"
+                payment_details.save(update_fields=["amount","payment_id","status","payment_method"])
 
             return redirect(checkout_url)
 
@@ -237,6 +310,42 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
             extra_data = {"notes": "Cash on Delivery selected by user."}
         )
 
+    def handle_esewa_payment(self, request, cart, cart_total):
+        ESEWA_MERCHANT_ID = settings.ESEWA_MERCHANT_ID
+        ESEWA_SECRET_KEY = settings.ESEWA_SECRET_KEY
+
+        # Transaction UUID Generation
+        trxn_uuid = f"{cart.id}-{random.randint(1000,9999)}"
+
+        # input text for signature generation
+        input_text = f"total_amount={cart_total},transaction_uuid={trxn_uuid},product_code={ESEWA_MERCHANT_ID}"
+        
+        # Signature Generation
+        hmac_sha256 = hmac.new(ESEWA_SECRET_KEY.encode('utf-8'), input_text.encode('utf-8'), hashlib.sha256)
+        digest = hmac_sha256.digest()
+        signature = base64.b64encode(digest).decode('utf-8') 
+
+        # Payment Details Capture
+        payment_details, created = PaymentDetails.objects.get_or_create(
+                cart = cart,
+                defaults=dict(
+                    order = None,
+                    payment_method = "esewa",
+                    payment_id = trxn_uuid,
+                    amount = cart_total,
+                    status = "pending",
+                )
+        )
+
+        if not created:
+            payment_details.amount = cart_total
+            payment_details.payment_id = trxn_uuid
+            payment_details.status = "pending"
+            payment_details.payment_method = "esewa"
+            payment_details.save(update_fields=["amount","payment_id","status","payment_method"])
+
+        # Send Data to Template for Form Submission
+        return {"amount":cart_total, "transaction_uuid":trxn_uuid, "product_code":ESEWA_MERCHANT_ID, "signature":signature, "product_code":ESEWA_MERCHANT_ID}
 
 
     def post(self, request, *args, **kwargs):
@@ -271,7 +380,11 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
                         return response
                     
                 case "esewa":
-                    pass
+                    data = self.handle_esewa_payment(request, cart, cart_total)
+                    context_data = self.get_context_data(**data)
+                    self.template_name = "client-panel/dashboard/esewa-payment.html"
+                    return self.render_to_response(context_data)
+                
                 case "cod":
                     self.handle_cod(request, context_data)
 
