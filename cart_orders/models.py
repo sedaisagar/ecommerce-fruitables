@@ -26,6 +26,8 @@ class PurchaseItems(BaseModel):
     def total(self):
         return self.price * self.quantity
 
+
+
 class ShippingBillingAddress(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="shipping_billing_address")
 
@@ -95,6 +97,23 @@ class PaymentDetails(BaseModel):
 
     class Meta:
         db_table = "payment_details"
+
+# Pre Save / Post Save Signals
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
+
+@receiver(pre_save, sender=PaymentDetails)
+def receive_payment_details_pre_save(sender, **kwargs):
+    print(vars(kwargs['instance']))
+
+@receiver(post_save, sender=PaymentDetails)
+def receive_payment_details_post_save(sender, **kwargs):
+    print(vars(kwargs['instance']))
+
+
+
+
+
 
 # User - X
 

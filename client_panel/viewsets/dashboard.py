@@ -16,6 +16,7 @@ from django.db.models import F,Sum
 from django.conf import settings
 
 import requests
+from django.db import transaction
 
 class ClientDashBoardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/index.html"
@@ -146,7 +147,8 @@ class ClientPaymentVerifyView(generic.TemplateView):
                         cart.save(update_fields=["order_notes"])
 
                         purchase_items.delete() # Clear Purchase Items After Order Created
-
+                        # breakpoint()
+                        # raise Exception("Testing Sentry Integration")
                         payment_details.order = user_order
                         payment_details.cart = None
                         payment_details.extra_data = response
@@ -158,14 +160,18 @@ class ClientPaymentVerifyView(generic.TemplateView):
     def get(self, request, *args, **kwargs):
         params = request.GET.dict()
 
-        if "data" in params:
-            # Handle Esewa Payment Verification Logic Here
-            return self.handle_esewa_payment_verification(request)
-        else:
-            # khalti
-            # Handle Payment Verification Logic Here
-            return self.handle_khalti_payment_verification(request)
-        
+        try:
+            with transaction.atomic():
+                if "data" in params:
+                    # Handle Esewa Payment Verification Logic Here
+                    return self.handle_esewa_payment_verification(request)
+                else:
+                    # khalti
+                    # Handle Payment Verification Logic Here
+                    return self.handle_khalti_payment_verification(request)
+        except Exception as e:
+            # fallback page
+            return redirect("client-dash")        
 class ClientCartView(LoginRequiredMixin, generic.TemplateView):
     template_name = "client-panel/dashboard/cart.html"
 
