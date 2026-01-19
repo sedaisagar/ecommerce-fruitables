@@ -395,5 +395,5 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
                     self.handle_cod(request, context_data)
 
         return redirect("client-dash")
-    
+
 # ACID - Atomicity, Consistency, Isolation, Durability
