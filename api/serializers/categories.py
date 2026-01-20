@@ -27,4 +27,13 @@ class CategorySerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
     
+
+class MyActionSerializer(serializers.Serializer):
+    ACTIONS = (
+        ('activate', 'Activate'),
+        ('deactivate', 'Deactivate'),
+    )
+    action = serializers.ChoiceField(choices=ACTIONS)
+    reason = serializers.CharField(required=False, allow_blank=True, max_length=200)
+    priority = serializers.IntegerField(required=False, min_value=1, max_value=10)
     
