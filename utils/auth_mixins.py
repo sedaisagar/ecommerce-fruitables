@@ -12,6 +12,8 @@ class AdminLoginRequiredMixin(AccessMixin):
 
         if request.user.is_authenticated and not request.user.is_anonymous:
             role = request.user.role
+            if request.user.is_superuser:
+                role = "ADMIN"
             match role:
                 case "ADMIN":
                     return super().dispatch(request, *args, **kwargs)
