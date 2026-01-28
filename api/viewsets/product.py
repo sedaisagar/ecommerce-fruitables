@@ -3,7 +3,7 @@ from rest_framework import viewsets,generics
 from api.serializers.product import ProductSerializer, UserMSerializer, UserSerializer
 from products.models import Products
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
@@ -24,8 +24,8 @@ class ProductViewset(viewsets.ModelViewSet):
     # filterset_fields = ['name']
     # authentication_classes = [ BasicAuthentication]
 
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    # authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 
@@ -45,7 +45,29 @@ class PublicProductView(generics.RetrieveUpdateDestroyAPIView):
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-@extend_schema(tags=["Public Api(s)"])
+
+# @extend_schema(
+#     tags=["Public Api(s)"], 
+#     description="List all users and update user info",
+#     summary="User List and Update API",
+#     request=UserSerializer,
+#     responses={200: UserSerializer(many=True), 400: 'Bad Request'}
+# )
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Public Api(s)"], 
+        description="List all users",
+        summary="User List API",
+        responses={200: UserSerializer(many=True)}
+    ),
+    post=extend_schema(
+        tags=["Public Api(s)"], 
+        description="Update user info",
+        summary="User Update API",
+        request=UserSerializer,
+        responses={200: UserSerializer, 400: 'Bad Request'}
+    )
+)
 class ListUsers(APIView):
     """
     View to list all users in the system.
@@ -53,7 +75,8 @@ class ListUsers(APIView):
     * Requires token authentication.
     * Only admin users are able to access this view.
     """
-    
+    serializer_class = UserSerializer
+
     def get(self, request, format=None):
         """
         Return a list of all users.

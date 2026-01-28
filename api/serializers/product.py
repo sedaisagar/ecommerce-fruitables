@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from api.serializers.categories import CategorySerializer
 from products.models import Products
 from users.models import User
 
@@ -23,5 +24,23 @@ class UserMSerializer(serializers.ModelSerializer):
         fields = ["email", "role"]
 
 class UserSerializer(serializers.Serializer):
-    email = serializers.CharField()
-    role = serializers.CharField()
+    email = serializers.EmailField()
+    role = serializers.ChoiceField(choices=User.ROLES)
+
+    def create(self, validated_data):
+        return validated_data
+    
+    def update(self, instance, validated_data):
+        
+        for k ,v in validated_data.items():
+            setattr(instance, k , v)
+
+        instance.save() 
+
+        return validated_data
+    
+    def to_representation(self, instance:dict):
+        if isinstance(instance, dict):
+            return {"message": f"User {instance["email"]} with role {instance["role"]} created successfully."}
+        else:
+            return super().to_representation(instance)

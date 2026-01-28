@@ -13,6 +13,6 @@ router.register("categories", CategoryViewset, basename="Categories")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("public-products/<str:id>/", PublicProductView.as_view()),
+    # path("public-products/<str:id>/", PublicProductView.as_view()),
     path("users/", ListUsers.as_view())
 ]
