@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from cart_orders.models import UserCart
 from products.models import Category, Products
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -25,3 +24,5 @@ class ProductSerializer(serializers.ModelSerializer):
         data =  super().to_representation(instance)
         # data["category"] = CategorySerializer(instance=instance.category).data
         return data
+      
+      

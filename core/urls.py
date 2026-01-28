@@ -24,6 +24,7 @@ urlpatterns = [
     path("", include("client_panel.urls")),
     path("api/", include("api.urls")),
 
+    
     # Third party package's url
     path('tinymce/', include('tinymce.urls')),
 ]
@@ -38,3 +39,26 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns += staticfiles_urlpatterns()
+
+
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns += [
+    path("api/", include([
+        path("", include("api.urls")),
+        # YOUR PATTERNS
+        path('schema/', SpectacularAPIView.as_view(), name='schema'), # Is responsible for schema 
+        # Optional UI:
+        path('doc/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+        # 
+        path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+        path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    ])),
+]
+
