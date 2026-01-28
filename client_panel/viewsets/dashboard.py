@@ -240,9 +240,13 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
     def handle_khalti_payment(self, request, cart, cart_total):
         # Khalti Payment Integration
         url = settings.KHALTI_API
-        initiate_url = url + "epayment/initiate/"
         secret_key = settings.KHALTI_LIVE_SECRET_KEY
 
+        if not url or not secret_key:
+            return redirect(request.path)
+
+        initiate_url = url + "epayment/initiate/"
+        
         headers = {
             "Authorization": f"Key {secret_key}",  
              'Content-Type': 'application/json',
@@ -320,6 +324,9 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
         ESEWA_MERCHANT_ID = settings.ESEWA_MERCHANT_ID
         ESEWA_SECRET_KEY = settings.ESEWA_SECRET_KEY
 
+        if not ESEWA_MERCHANT_ID or not ESEWA_SECRET_KEY:
+            return 
+
         # Transaction UUID Generation
         trxn_uuid = f"{cart.id}-{random.randint(1000,9999)}"
 
@@ -387,6 +394,9 @@ class ClientCheckOutView(LoginRequiredMixin, generic.TemplateView):
                     
                 case "esewa":
                     data = self.handle_esewa_payment(request, cart, cart_total)
+                    if not data:
+                        return redirect(request.path)
+                        
                     context_data = self.get_context_data(**data)
                     self.template_name = "client-panel/dashboard/esewa-payment.html"
                     return self.render_to_response(context_data)

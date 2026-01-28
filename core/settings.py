@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'tinymce',
+    'rest_framework',
+    'drf_spectacular',
 ]
 
 SITE_ID=1
@@ -193,3 +195,25 @@ KHALTI_API = os.getenv("KHALTI_API")
 
 ESEWA_MERCHANT_ID= os.getenv("ESEWA_MERCHANT_ID")
 ESEWA_SECRET_KEY= os.getenv("ESEWA_SECRET_KEY")
+
+
+REST_FRAMEWORK = {
+    # YOUR SETTINGS
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ecommerce Fruitables - API',
+    'DESCRIPTION': 'This is the documentation for ecommerce fruitable api',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

@@ -1,3 +1,4 @@
+import random
 from django.db import models
 
 from utils.models import CommonModel
@@ -19,6 +20,9 @@ class Category(CommonModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+            if Category.objects.filter(slug=self.slug).exists():
+                random_number = random.randint(1000, 9999)
+                self.slug = f"{self.slug}-{random_number}"
             
         super().save(*args, **kwargs)
 
