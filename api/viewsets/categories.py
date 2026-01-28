@@ -11,6 +11,11 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser,IsAuthenticatedOrReadOnly
+
+from utils.custom_permissions import IsCustomer, IsSystemAdmin
+
 @extend_schema(tags=["Category(s)"])
 class CategoryViewset(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.GenericViewSet):
     queryset = Category.objects.all()
@@ -22,6 +27,9 @@ class CategoryViewset(mixins.ListModelMixin,mixins.CreateModelMixin,viewsets.Gen
     #     'put',
     #     'delete',
     # ]
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsSystemAdmin]
 
     def get_queryset(self):
         if self.action == 'list':

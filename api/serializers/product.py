@@ -1,11 +1,7 @@
 from rest_framework import serializers
 
-from products.models import Category, Products
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ["id","name","slug"]
+from products.models import Products
+from users.models import User
 
 class ProductSerializer(serializers.ModelSerializer):
     # category = CategorySerializer(read_only=True)   
@@ -18,11 +14,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Products
-        fields = "__all__"
+        fields="__all__"
 
-    def to_representation(self, instance):
-        data =  super().to_representation(instance)
-        # data["category"] = CategorySerializer(instance=instance.category).data
-        return data
-      
-      
+
+class UserMSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["email", "role"]
+
+class UserSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    role = serializers.CharField()
