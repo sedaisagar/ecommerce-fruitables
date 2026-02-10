@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'tinymce',
     'rest_framework',
     'drf_spectacular',
-    'django_celery_results',
+    # 'django_celery_results',
 ]
 
 SITE_ID=1
@@ -227,21 +227,21 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-CELERY_RESULT_BACKEND = 'django-db'
-# pick which cache from the CACHES setting.
-CELERY_CACHE_BACKEND = 'default'
+# CELERY_RESULT_BACKEND = 'django-db'
+# # pick which cache from the CACHES setting.
+# CELERY_CACHE_BACKEND = 'default'
 
-# django setting.
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_table',
-    }
-}
+# # django setting.
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'cache_table',
+#     }
+# }
 
-CELERY_TIMEZONE = "Asia/Kathmandu"
-CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
+# CELERY_TIMEZONE = "Asia/Kathmandu"
+# CELERY_TASK_TRACK_STARTED = True
+# CELERY_TASK_TIME_LIMIT = 30 * 60
 
 
 # Time consuming job
