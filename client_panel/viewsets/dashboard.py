@@ -186,7 +186,7 @@ class ClientCartView(LoginRequiredMixin, generic.TemplateView):
 
         # Logic Here
         if quantity <= 0:
-            PurchaseItems.objects.filter(cart= cart, product=product).delete()         
+            PurchaseItems.objects.filter(cart= cart, product=product).delete()    # 2 min     
         else:
             purchase_item, created = PurchaseItems.objects.get_or_create(cart=cart, product=product, defaults=dict(quantity=quantity, price = product.price))
             if not created:
